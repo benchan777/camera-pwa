@@ -71,7 +71,7 @@ const startVideo = async (constraints) => {
   const currentCameraSettings = track.getSettings();
   document.getElementById('current-settings').onclick = () => {
     const settingsInfo = document.createElement('p');
-    settingsInfo.innerText = currentCameraSettings.focusDistance
+    settingsInfo.innerText = `Current focus level: ${currentCameraSettings.focusDistance}`
     document.body.appendChild(settingsInfo)
     console.log(track.getSettings())
   }

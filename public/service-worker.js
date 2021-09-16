@@ -1,5 +1,5 @@
 const cacheName = 'cameraApp';
-const version = '23';
+const version = '24';
 
 // Cache all files in order to create the PWA
 self.addEventListener('install', e => {
