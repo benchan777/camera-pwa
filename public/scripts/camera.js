@@ -65,7 +65,8 @@ const startVideo = async (constraints) => {
   }
 
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  const track = stream.getVideoTracks()[0]  
+  const track = stream.getVideoTracks()[0]
+  console.log(track.getSettings())
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
@@ -76,7 +77,6 @@ const startVideo = async (constraints) => {
     advanced: [
       { 
         torch: false,
-        zoom: 8
       }
     ]
   })
