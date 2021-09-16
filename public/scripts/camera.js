@@ -129,6 +129,7 @@ const takePhoto = () => {
 
 // Function that loops ImageCapture to simulate a video stream
 const photoLoop = () => {
+  // TODO: enable flash, test photo constraints (zoom, focus location, etc)
   stopLoop = false;
 
   navigator.mediaDevices.enumerateDevices()
@@ -148,7 +149,7 @@ const photoLoop = () => {
       imageCapture = new ImageCapture(track);
 
       function startLoop() {
-        if (stopLoop == true) {
+        if (stopLoop == true) { // Exit infinite loop if stopLoop set to true by pause button
           return
         }
 
@@ -302,11 +303,15 @@ document.getElementById('play').onclick = () => {
 
 // Pause video stream when pause button is clicked
 document.getElementById('pause').onclick = () => {
-  // video.pause();
-  stopLoop = true;
-
+  video.pause();
 };
 
+// Set stopLoop to true to trigger photoLoop() to exit infinite loop
+document.getElementById('pause-photo-loop').onclick = () => {
+  stopLoop = true;
+}
+
+// Display all images located in IndexedDB
 document.getElementById('view').onclick = () => {
   // location.href = '/show-photos'
   getItem();
@@ -328,6 +333,11 @@ document.getElementById('save-image').onclick = async () => {
   })
 };
 
+// Start photo loop
+document.getElementById('photo-loop').onclick = () => {
+  photoLoop();
+};
+
 // Install the PWA
 document.getElementById('installApp').onclick = async () => {
   if (deferredPrompt !== null) {
@@ -337,9 +347,4 @@ document.getElementById('installApp').onclick = async () => {
       deferredPrompt = null;
     }
   }
-};
-
-// Start photo loop
-document.getElementById('photo-loop').onclick = () => {
-  photoLoop();
 };
