@@ -51,11 +51,11 @@ openRequest.onerror = event => {
 };
 
 // Load coco-ssd (object detection model) 
-cocoSsd.load()
-.then( loadedModel => {
-  model = loadedModel;
-  document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
-})
+// cocoSsd.load()
+// .then( loadedModel => {
+//   model = loadedModel;
+//   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
+// })
 
 // Function that starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
@@ -147,6 +147,14 @@ const photoLoop = () => {
     .then( stream => {
       const track = stream.getVideoTracks()[0];
       imageCapture = new ImageCapture(track);
+      imageCapture.getPhotoCapabilities()
+      .then( res => {
+        for (const i in res) {
+          const info = document.createElement('p');
+          info.innerText = `key: ${i} value: ${res[i]}`;
+          document.body.appendChild(info);
+        }
+      })
 
       function startLoop() {
         if (stopLoop == true) { // Exit infinite loop if stopLoop set to true by pause button
@@ -158,7 +166,9 @@ const photoLoop = () => {
           const fakeVideo = document.getElementById('photo-video');
           fakeVideo.src = URL.createObjectURL(blob);
           document.body.appendChild(fakeVideo);
-          startLoop();
+          console.log(fakeVideo.width)
+          console.log(fakeVideo.height)
+          // startLoop();
         })
         .catch( error => {
           console.log(error)
