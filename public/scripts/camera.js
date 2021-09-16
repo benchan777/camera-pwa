@@ -1,7 +1,7 @@
 // const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
 const img = document.querySelector('img');
-const screenshot = document.querySelector('.save-image')
+// const screenshot = document.querySelector('.save-image')
 // const buttons = [...cameraControls.querySelectorAll('button')];
 // const [play, pause, saveImage, viewPhotos] = buttons;
 // const play = document.getElementById('play');
@@ -16,6 +16,7 @@ let model = undefined;
 let children = [];
 let imageCount = 0;
 let deferredPrompt;
+let stopLoop = false;
 
 // Triggers browser to prompt user to install the PWA
 // Save event deferred event in case user doesn't take default install prompt
@@ -128,35 +129,39 @@ const takePhoto = () => {
 
 // Function that loops ImageCapture to simulate a video stream
 const photoLoop = () => {
-  return new Promise( (resolve, reject) => {
-    navigator.mediaDevices.enumerateDevices()
-    .then( devices => {
-      const cameras = devices.filter( device => device.kind === 'videoinput');
-      const camera = cameras[cameras.length - 1];
-      const videoConstraints = {
-        video: {
-          deviceId: camera.deviceId,
-          facingMode: 'environment'
-        }
+  stopLoop = false;
+
+  navigator.mediaDevices.enumerateDevices()
+  .then( devices => {
+    const cameras = devices.filter( device => device.kind === 'videoinput');
+    const camera = cameras[cameras.length - 1];
+    const videoConstraints = {
+      video: {
+        deviceId: camera.deviceId,
+        facingMode: 'environment'
       }
+    };
 
-      navigator.mediaDevices.getUserMedia(videoConstraints)
-      .then( stream => {
-        const track = stream.getVideoTracks()[0];
+    navigator.mediaDevices.getUserMedia(videoConstraints)
+    .then( stream => {
+      const track = stream.getVideoTracks()[0];
+      imageCapture = new ImageCapture(track);
 
-        imageCapture = new ImageCapture(track);
-        console.log('test')
+      function startLoop() {
+        if (stopLoop == true) {
+          return
+        }
+
         imageCapture.takePhoto()
         .then( blob => {
           const fakeVideo = document.getElementById('photo-video');
           fakeVideo.src = URL.createObjectURL(blob);
           document.body.appendChild(fakeVideo);
-          resolve();
+          startLoop();
         })
-        .catch( error => {
-          reject(error);
-        })
-      })
+      }
+
+      startLoop();
     })
   })
 };
@@ -298,6 +303,8 @@ document.getElementById('play').onclick = () => {
 // Pause video stream when pause button is clicked
 document.getElementById('pause').onclick = () => {
   // video.pause();
+  stopLoop = true;
+
 };
 
 document.getElementById('view').onclick = () => {
@@ -334,10 +341,5 @@ document.getElementById('installApp').onclick = async () => {
 
 // Start photo loop
 document.getElementById('photo-loop').onclick = () => {
-  photoLoop()
-  .then( () => {
-    setTimeout( () => {
-      document.getElementById('photo-loop').click();
-    }, 1)
-  })
+  photoLoop();
 };
