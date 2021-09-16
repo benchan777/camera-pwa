@@ -51,11 +51,11 @@ openRequest.onerror = event => {
 };
 
 // Load coco-ssd (object detection model) 
-// cocoSsd.load()
-// .then( loadedModel => {
-//   model = loadedModel;
-//   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
-// })
+cocoSsd.load()
+.then( loadedModel => {
+  model = loadedModel;
+  document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
+})
 
 // Function that starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
@@ -73,7 +73,8 @@ const startVideo = async (constraints) => {
 
   // Turn on flashlight
   track.applyConstraints({
-    advanced: [{ torch: true }]
+    // advanced: [{ torch: true }]
+    torch: true
   })
   .catch( err => {
     document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
@@ -149,12 +150,14 @@ const photoLoop = () => {
       imageCapture = new ImageCapture(track);
       imageCapture.getPhotoCapabilities()
       .then( res => {
-        for (const i in res) {
-          const info = document.createElement('p');
-          info.innerText = `key: ${i} value: ${res[i]}`;
-          document.body.appendChild(info);
-        }
+        console.log(res)
+        // for (const i in res) {
+        //   const info = document.createElement('p');
+        //   info.innerText = `key: ${i} value: ${res[i]}`;
+        //   document.body.appendChild(info);
+        // }
       })
+      console.log(navigator.mediaDevices.getSupportedConstraints())
 
       function startLoop() {
         if (stopLoop == true) { // Exit infinite loop if stopLoop set to true by pause button
