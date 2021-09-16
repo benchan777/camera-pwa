@@ -142,7 +142,7 @@ const photoLoop = () => {
       video: {
         deviceId: camera.deviceId,
         facingMode: 'environment',
-        torch: true
+        fillLightMode: 'flash'
       }
     };
 
