@@ -69,9 +69,11 @@ const startVideo = async (constraints) => {
   const cameraCapabilities = track.getCapabilities();
   console.log(cameraCapabilities)
   const currentCameraSettings = track.getSettings();
+
+  // Get current camera settings on button click
   document.getElementById('current-settings').onclick = () => {
     const settingsInfo = document.createElement('p');
-    settingsInfo.innerText = `Current focus level: ${track.getSettings().focusDistance}`
+    settingsInfo.innerText = `Current focus level: ${track.getSettings().focusDistance} // Current zoom level: ${track.getSettings().zoom}`
     document.body.appendChild(settingsInfo)
     console.log(track.getSettings())
   }
