@@ -4,11 +4,11 @@ const img = document.querySelector('img');
 const screenshot = document.querySelector('.save-image')
 // const buttons = [...cameraControls.querySelectorAll('button')];
 // const [play, pause, saveImage, viewPhotos] = buttons;
-const play = document.getElementById('play');
-const pause = document.getElementById('pause');
-const saveImage = document.getElementById('save-image');
-const viewPhotos = document.getElementById('view');
-const installApp = document.getElementById('installApp');
+// const play = document.getElementById('play');
+// const pause = document.getElementById('pause');
+// const saveImage = document.getElementById('save-image');
+// const viewPhotos = document.getElementById('view');
+// const installApp = document.getElementById('installApp');
 
 let cameraOn = false;
 let imageCapture;
@@ -23,20 +23,6 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
 });
-
-// // Detect if device is running iOS
-// const isIos = () => {
-//   const userAgent = window.navigator.userAgent.toLowerCase();
-//   return /iphone|ipad|ipod|/.test( userAgent );
-// }
-
-// const testing = isIos()
-// document.getElementById('errorMessage').innerHTML = window.navigator.platform
-
-// // Display install popup notification if iOS device is detected
-// if (isIos() && !isInStandaloneMode()) {
-//   this.setState({ showInstallMessage: true });
-// }
 
 // DATABASE SETUP
 // Creates new database with the name 'image_db' and set version to 1
@@ -140,6 +126,41 @@ const takePhoto = () => {
   })
 };
 
+// Function that loops ImageCapture to simulate a video stream
+const photoLoop = () => {
+  return new Promise( (resolve, reject) => {
+    navigator.mediaDevices.enumerateDevices()
+    .then( devices => {
+      const cameras = devices.filter( device => device.kind === 'videoinput');
+      const camera = cameras[cameras.length - 1];
+      const videoConstraints = {
+        video: {
+          deviceId: camera.deviceId,
+          facingMode: 'environment'
+        }
+      }
+
+      navigator.mediaDevices.getUserMedia(videoConstraints)
+      .then( stream => {
+        const track = stream.getVideoTracks()[0];
+
+        imageCapture = new ImageCapture(track);
+        console.log('test')
+        imageCapture.takePhoto()
+        .then( blob => {
+          const fakeVideo = document.getElementById('photo-video');
+          fakeVideo.src = URL.createObjectURL(blob);
+          document.body.appendChild(fakeVideo);
+          resolve();
+        })
+        .catch( error => {
+          reject(error);
+        })
+      })
+    })
+  })
+};
+
 // Function that adds images to IndexedDB with a corresponding key
 const addItem = (key, image) => {
   let transaction = db.transaction('images', 'readwrite'); // create new transaction object from 'images' objectStore. allow read/write
@@ -174,23 +195,33 @@ const getItem = () => {
       img.src = URL.createObjectURL(imageArray[i]);
       document.body.appendChild(img);
     }
+    const allImages = document.querySelectorAll('img');
+    console.log(allImages);
+    model.detect(allImages[3].currentSrc)
+    .then( asdf => {
+      console.log(asdf)
+    })
   }
 };
 
 // Function to clear IndexedDB
 const clearDb = () => {
-  let transaction = db.transaction('images', 'readwrite');
-  let store = transaction.objectStore('images');
-  let request = store.clear();
-
-  request.onerror = event => {
-    console.log('failed to clear db', event)
-  }
-
-  request.onsuccess = event => {
-    console.log('IndexedDB cleared successfully!')
-  }
-}
+  return new Promise( (resolve, reject) => {
+    let transaction = db.transaction('images', 'readwrite');
+    let store = transaction.objectStore('images');
+    let request = store.clear();
+  
+    request.onerror = event => {
+      console.log('failed to clear db', event)
+      reject(event);
+    }
+  
+    request.onsuccess = event => {
+      console.log('IndexedDB cleared successfully!')
+      resolve(event);
+    }
+  })
+};
 
 // Draws a frame around the subject based on confidence score returned by tensorflow
 const predictWebcam = () => {
@@ -236,7 +267,7 @@ const predictWebcam = () => {
 };
 
 // Start video when play button is clicked
-play.onclick = () => {
+document.getElementById('play').onclick = () => {
   if (cameraOn == true) {
       video.play();
       return;
@@ -265,24 +296,24 @@ play.onclick = () => {
 };
 
 // Pause video stream when pause button is clicked
-pause.onclick = () => {
-  video.pause();
+document.getElementById('pause').onclick = () => {
+  // video.pause();
 };
 
-viewPhotos.onclick = () => {
+document.getElementById('view').onclick = () => {
   // location.href = '/show-photos'
   getItem();
 };
 
 // Take full resolution images and save to the database
-saveImage.onclick = () => {
+document.getElementById('save-image').onclick = async () => {  
   takePhoto() // Call function to take full res photo
   .then( photo => {
     imageCount += 1;
     addItem(`image${imageCount}`, photo); // Store image into IndexedDB
     setTimeout( () => {
       document.getElementById('save-image').click(); // Delay 500ms, then take another photo
-    }, 500)
+    }, 1)
   })
   .catch( error => {
     document.getElementById('errorMessage').innerHTML = `Error at :${error}`
@@ -291,7 +322,7 @@ saveImage.onclick = () => {
 };
 
 // Install the PWA
-installApp.onclick = async () => {
+document.getElementById('installApp').onclick = async () => {
   if (deferredPrompt !== null) {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -299,4 +330,14 @@ installApp.onclick = async () => {
       deferredPrompt = null;
     }
   }
+};
+
+// Start photo loop
+document.getElementById('photo-loop').onclick = () => {
+  photoLoop()
+  .then( () => {
+    setTimeout( () => {
+      document.getElementById('photo-loop').click();
+    }, 1)
+  })
 };

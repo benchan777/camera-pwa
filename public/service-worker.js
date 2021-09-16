@@ -17,18 +17,16 @@ self.addEventListener('install', e => {
                 './images/splash-screen.png',
                 './scripts/camera.js',
                 './scripts/coco-ssd.js',
-                './scripts/show-images.js',
                 './scripts/tensorflow.js',
                 './styles/styles.css',
                 './views/layouts/main.handlebars',
-                './views/home.handlebars',
-                './views/show-photos.handlebars'
+                './views/home.handlebars'
             ]);
         })
     );
 });
 
-//
+// Load page from cache if cached version already exists
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
