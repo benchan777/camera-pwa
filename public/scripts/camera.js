@@ -151,6 +151,7 @@ const photoLoop = () => {
     navigator.mediaDevices.getUserMedia(videoConstraints)
     .then( stream => {
       const track = stream.getVideoTracks()[0];
+      console.log(track.getCapabilities())
       imageCapture = new ImageCapture(track);
 
       function startLoop() {
@@ -165,7 +166,7 @@ const photoLoop = () => {
           // document.body.appendChild(fakeVideo);
           console.log(fakeVideo.width)
           console.log(fakeVideo.height)
-          startLoop();
+          // startLoop();
         })
         .catch( error => {
           console.log(error)
