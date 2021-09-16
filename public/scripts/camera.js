@@ -70,7 +70,7 @@ const startVideo = async (constraints) => {
   const capabilities = track.getCapabilities();
   for (const i in capabilities) {
     const asdf = document.createElement('p');
-    asdf.innerText = i;
+    asdf.innerText = `${i}: ${capabilities[i].max}, ${capabilities[i].min}, ${capabilities[i].step}`
     document.body.appendChild(asdf);
   }
 
