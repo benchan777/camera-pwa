@@ -68,7 +68,11 @@ const startVideo = async (constraints) => {
   const track = stream.getVideoTracks()[0]
   console.log(track.getCapabilities())
   const capabilities = track.getCapabilities();
-  document.getElementById('information').innerHTML = capabilities.zoom
+  for (const i in capabilities) {
+    const asdf = document.createElement('p');
+    asdf.innerText = i;
+    document.body.appendChild(asdf);
+  }
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
@@ -306,7 +310,7 @@ document.getElementById('play').onclick = () => {
         video: {
           deviceId: camera.deviceId,
           facingMode: 'environment',
-          // zoom: true,
+          zoom: true,
         }
       }
 
