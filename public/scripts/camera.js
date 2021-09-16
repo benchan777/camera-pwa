@@ -70,7 +70,7 @@ const startVideo = async (constraints) => {
   console.log(cameraCapabilities)
   const currentCameraSettings = track.getSettings();
   document.getElementById('current-settings').onclick = () => {
-    console.log(track.getSettings)
+    console.log(track.getSettings())
   }
 
   const zoomInput = document.getElementById('zoom')
