@@ -72,15 +72,14 @@ const startVideo = async (constraints) => {
   video.addEventListener('loadeddata', predictWebcam);
 
   // Turn on flashlight
-  track.applyConstraints({
-    advanced: [
-      { torch: true },
-      { zoom: 10 }
-    ]
-  })
-  .catch( err => {
-    document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
-  })
+  // track.applyConstraints({
+  //   advanced: [
+  //     { torch: true }
+  //   ]
+  // })
+  // .catch( err => {
+  //   document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
+  // })
 }
 
 // Function that can take a full resolution photo with the camera
@@ -142,7 +141,8 @@ const photoLoop = () => {
     const videoConstraints = {
       video: {
         deviceId: camera.deviceId,
-        facingMode: 'environment'
+        facingMode: 'environment',
+        torch: true
       }
     };
 
