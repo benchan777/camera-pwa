@@ -16,7 +16,6 @@ let model = undefined;
 let children = [];
 let imageCount = 0;
 let deferredPrompt;
-// let stopLoop = false;
 
 // Triggers browser to prompt user to install the PWA
 // Save event deferred event in case user doesn't take default install prompt
@@ -92,7 +91,7 @@ const startVideo = async (constraints) => {
     })
   }
 
-  // Add ISO capabilities to the slider
+  // Add focus distance capabilities to the slider
   focusInput.min = cameraCapabilities.focusDistance.min;
   focusInput.max = cameraCapabilities.focusDistance.max;
   focusInput.step = cameraCapabilities.focusDistance.step;
@@ -163,66 +162,6 @@ const takePhoto = () => {
   })
 };
 
-// Function that loops ImageCapture to simulate a video stream
-// const photoLoop = () => {
-//   // TODO: enable flash, test photo constraints (zoom, focus location, etc)
-//   stopLoop = false;
-
-//   navigator.mediaDevices.enumerateDevices()
-//   .then( devices => {
-//     const cameras = devices.filter( device => device.kind === 'videoinput');
-//     const camera = cameras[cameras.length - 1];
-//     const videoConstraints = {
-//       video: {
-//         deviceId: camera.deviceId,
-//         facingMode: 'environment'
-//       }
-//     };
-
-//     navigator.mediaDevices.getUserMedia(videoConstraints)
-//     .then( stream => {
-//       const track = stream.getVideoTracks()[0];
-//       track.applyConstraints({
-//         advanced: [
-//           { torch: false }
-//         ]
-//       })
-//       .catch( err => {
-//         console.log(err)
-//       })
-
-//       imageCapture = new ImageCapture(track);
-
-//       function startLoop() {
-//         if (stopLoop == true) { // Exit infinite loop if stopLoop set to true by pause button
-//           return
-//         }
-
-//         imageCapture.takePhoto({ fillLightMode: 'flash' })
-//         .then( blob => {
-//           const fakeVideo = document.getElementById('photo-video');
-//           fakeVideo.src = URL.createObjectURL(blob);
-//           // document.body.appendChild(fakeVideo);
-//           console.log(fakeVideo.width)
-//           console.log(fakeVideo.height)
-//           // startLoop();
-//         })
-//         .catch( error => {
-//           console.log(error)
-//         })
-//       }
-
-//       startLoop();
-//     })
-//     .catch( error => {
-//       console.log(error)
-//     })
-//   })
-//   .catch( error => {
-//     console.log(error)
-//   })
-// };
-
 // Function that adds images to IndexedDB with a corresponding key
 const addItem = (key, image) => {
   let transaction = db.transaction('images', 'readwrite'); // create new transaction object from 'images' objectStore. allow read/write
@@ -257,12 +196,6 @@ const getItem = () => {
       img.src = URL.createObjectURL(imageArray[i]);
       document.body.appendChild(img);
     }
-    // const allImages = document.querySelectorAll('img');
-    // console.log(allImages);
-    // model.detect(allImages[3].currentSrc)
-    // .then( asdf => {
-    //   console.log(asdf)
-    // })
   }
 };
 
@@ -363,11 +296,6 @@ document.getElementById('pause').onclick = () => {
   video.pause();
 };
 
-// Set stopLoop to true to trigger photoLoop() to exit infinite loop
-document.getElementById('pause-photo-loop').onclick = () => {
-  stopLoop = true;
-}
-
 // Display all images located in IndexedDB
 document.getElementById('view').onclick = () => {
   // location.href = '/show-photos'
@@ -389,11 +317,6 @@ document.getElementById('save-image').onclick = async () => {
     console.log(error)
   })
 };
-
-// Start photo loop
-// document.getElementById('photo-loop').onclick = () => {
-//   photoLoop();
-// };
 
 // Install the PWA
 document.getElementById('installApp').onclick = async () => {
