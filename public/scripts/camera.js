@@ -66,7 +66,34 @@ const startVideo = async (constraints) => {
 
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
   const track = stream.getVideoTracks()[0]
-  console.log(track.getSettings())
+  const cameraCapabilities = track.getCapabilities();
+  console.log(cameraCapabilities)
+  const currentCameraSettings = track.getSettings();
+
+  const zoomInput = document.getElementById('zoom')
+  const isoInput = document.getElementById('iso')
+
+  // Add Zoom capabilities to the slider
+  zoomInput.min = cameraCapabilities.zoom.min;
+  zoomInput.max = cameraCapabilities.zoom.max;
+  zoomInput.step = cameraCapabilities.zoom.step;
+  zoomInput.value = currentCameraSettings.zoom;
+  zoomInput.oninput = (event) => {
+    track.applyConstraints({
+      advanced: [{ zoom: event.target.value }]
+    })
+  }
+
+  // Add ISO capabilities to the slider
+  isoInput.min = cameraCapabilities.iso.min;
+  isoInput.max = cameraCapabilities.iso.max;
+  isoInput.step = cameraCapabilities.iso.step;
+  isoInput.value = currentCameraSettings.iso;
+  isoInput.oninput = (event) => {
+    track.applyConstraints({
+      advanced: [{ iso: event.target.value }]
+    })
+  }
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
@@ -74,11 +101,7 @@ const startVideo = async (constraints) => {
 
   // Turn on flashlight
   track.applyConstraints({
-    advanced: [
-      { 
-        torch: false,
-      }
-    ]
+    advanced: [{ torch: true }]
   })
   .catch( err => {
     document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
@@ -151,12 +174,10 @@ const photoLoop = () => {
     navigator.mediaDevices.getUserMedia(videoConstraints)
     .then( stream => {
       const track = stream.getVideoTracks()[0];
-      console.log(track.getCapabilities())
       track.applyConstraints({
         advanced: [
           { 
-            torch: false ,
-            zoom: 8
+            torch: false
           }
         ]
       })
@@ -319,7 +340,7 @@ document.getElementById('play').onclick = () => {
         video: {
           deviceId: camera.deviceId,
           facingMode: 'environment',
-          zoom: true,
+          zoom: true
         }
       }
 
