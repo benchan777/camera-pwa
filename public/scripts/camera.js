@@ -118,7 +118,7 @@ const startVideo = async (constraints) => {
 // Function that can take a full resolution photo with the camera
 const takePhoto = () => {
   return new Promise( (resolve, reject) => {
-    if (imageCount > 10) { // Number of photos to take before stopping
+    if (imageCount > 1) { // Number of photos to take before stopping
       imageCount = 0;
       document.getElementById('information').innerHTML = 'All images have been taken. Click on the View Photos button to view them!'
       return
@@ -279,8 +279,7 @@ document.getElementById('play').onclick = () => {
         video: {
           deviceId: camera.deviceId,
           facingMode: 'environment',
-          zoom: true,
-          focusMode: 'manual'
+          zoom: true
         }
       }
 
