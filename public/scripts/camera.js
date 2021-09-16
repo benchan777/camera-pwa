@@ -71,7 +71,7 @@ const startVideo = async (constraints) => {
   const currentCameraSettings = track.getSettings();
 
   const zoomInput = document.getElementById('zoom')
-  const isoInput = document.getElementById('iso')
+  const focusInput = document.getElementById('focus')
 
   // Add Zoom capabilities to the slider
   zoomInput.min = cameraCapabilities.zoom.min;
@@ -85,13 +85,13 @@ const startVideo = async (constraints) => {
   }
 
   // Add ISO capabilities to the slider
-  isoInput.min = cameraCapabilities.iso.min;
-  isoInput.max = cameraCapabilities.iso.max;
-  isoInput.step = cameraCapabilities.iso.step;
-  isoInput.value = currentCameraSettings.iso;
-  isoInput.oninput = (event) => {
+  focusInput.min = cameraCapabilities.focusDistance.min;
+  focusInput.max = cameraCapabilities.focusDistance.max;
+  focusInput.step = cameraCapabilities.focusDistance.step;
+  focusInput.value = currentCameraSettings.focusDistance;
+  focusInput.oninput = event => {
     track.applyConstraints({
-      advanced: [{ iso: event.target.value }]
+      advanced: [{ focusDistance: event.target.value }]
     })
   }
 
@@ -340,7 +340,8 @@ document.getElementById('play').onclick = () => {
         video: {
           deviceId: camera.deviceId,
           facingMode: 'environment',
-          zoom: true
+          zoom: true,
+          focusMode: 'manual'
         }
       }
 
