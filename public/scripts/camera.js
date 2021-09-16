@@ -94,7 +94,7 @@ const startVideo = async (constraints) => {
   focusInput.value = currentCameraSettings.focusDistance;
   focusInput.oninput = event => {
     track.applyConstraints({
-      advanced: [{ focusDistance: event.target.value }]
+      advanced: [{ focusMode: 'manual', focusDistance: event.target.value }]
     })
   }
 
