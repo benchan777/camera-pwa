@@ -1,7 +1,7 @@
 {
-    "name": "Camera App PWA",
-    "short_name": "Camera App",
-    "description": "A camera app that can run offline maybe?",
+    "name": "Strepscan PWA",
+    "short_name": "Strepscan",
+    "description": "Web app powered by AI and camera to take images of different areas of the throat.",
     "icons": [
         {
             "src": "/images/splash-screen.png",

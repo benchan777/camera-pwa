@@ -160,10 +160,19 @@ const photoLoop = () => {
           document.body.appendChild(fakeVideo);
           startLoop();
         })
+        .catch( error => {
+          console.log(error)
+        })
       }
 
       startLoop();
     })
+    .catch( error => {
+      console.log(error)
+    })
+  })
+  .catch( error => {
+    console.log(error)
   })
 };
 
@@ -201,12 +210,12 @@ const getItem = () => {
       img.src = URL.createObjectURL(imageArray[i]);
       document.body.appendChild(img);
     }
-    const allImages = document.querySelectorAll('img');
-    console.log(allImages);
-    model.detect(allImages[3].currentSrc)
-    .then( asdf => {
-      console.log(asdf)
-    })
+    // const allImages = document.querySelectorAll('img');
+    // console.log(allImages);
+    // model.detect(allImages[3].currentSrc)
+    // .then( asdf => {
+    //   console.log(asdf)
+    // })
   }
 };
 
