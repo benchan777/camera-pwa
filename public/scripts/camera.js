@@ -149,30 +149,20 @@ const photoLoop = () => {
     .then( stream => {
       const track = stream.getVideoTracks()[0];
       imageCapture = new ImageCapture(track);
-      imageCapture.getPhotoCapabilities()
-      .then( res => {
-        console.log(res)
-        // for (const i in res) {
-        //   const info = document.createElement('p');
-        //   info.innerText = `key: ${i} value: ${res[i]}`;
-        //   document.body.appendChild(info);
-        // }
-      })
-      console.log(navigator.mediaDevices.getSupportedConstraints())
 
       function startLoop() {
         if (stopLoop == true) { // Exit infinite loop if stopLoop set to true by pause button
           return
         }
 
-        imageCapture.takePhoto()
+        imageCapture.takePhoto({ fillLightMode: 'flash' })
         .then( blob => {
           const fakeVideo = document.getElementById('photo-video');
           fakeVideo.src = URL.createObjectURL(blob);
-          document.body.appendChild(fakeVideo);
+          // document.body.appendChild(fakeVideo);
           console.log(fakeVideo.width)
           console.log(fakeVideo.height)
-          // startLoop();
+          startLoop();
         })
         .catch( error => {
           console.log(error)
@@ -307,8 +297,7 @@ document.getElementById('play').onclick = () => {
     navigator.mediaDevices.enumerateDevices()
     .then( devices => {
       const cameras = devices.filter( device => device.kind === 'videoinput');
-      // const camera = cameras[cameras.length - 1];
-      const camera = cameras[0]
+      const camera = cameras[cameras.length - 1];
 
       const videoConstraints = {
         video: {
