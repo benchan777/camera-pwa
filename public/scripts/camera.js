@@ -73,8 +73,10 @@ const startVideo = async (constraints) => {
 
   // Turn on flashlight
   track.applyConstraints({
-    // advanced: [{ torch: true }]
-    torch: true
+    advanced: [
+      { torch: true },
+      { iso: 300 }
+    ]
   })
   .catch( err => {
     document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
@@ -312,6 +314,7 @@ document.getElementById('play').onclick = () => {
         video: {
           deviceId: camera.deviceId,
           facingMode: 'environment',
+          iso: 300
         }
       }
 
