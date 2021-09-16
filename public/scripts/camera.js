@@ -65,14 +65,7 @@ const startVideo = async (constraints) => {
   }
 
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  const track = stream.getVideoTracks()[0]
-  console.log(track.getCapabilities())
-  const capabilities = track.getCapabilities();
-  for (const i in capabilities) {
-    const asdf = document.createElement('p');
-    asdf.innerText = `${i}: ${capabilities[i].max}, ${capabilities[i].min}, ${capabilities[i].step}`
-    document.body.appendChild(asdf);
-  }
+  const track = stream.getVideoTracks()[0]  
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
@@ -81,7 +74,10 @@ const startVideo = async (constraints) => {
   // Turn on flashlight
   track.applyConstraints({
     advanced: [
-      { torch: true }
+      { 
+        torch: true ,
+        focusDistance: 0.222222
+      }
     ]
   })
   .catch( err => {
