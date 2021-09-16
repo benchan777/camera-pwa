@@ -75,8 +75,8 @@ const startVideo = async (constraints) => {
   track.applyConstraints({
     advanced: [
       { 
-        torch: true ,
-        focusDistance: 0.222222
+        torch: false,
+        zoom: 8
       }
     ]
   })
