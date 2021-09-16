@@ -152,6 +152,18 @@ const photoLoop = () => {
     .then( stream => {
       const track = stream.getVideoTracks()[0];
       console.log(track.getCapabilities())
+      track.applyConstraints({
+        advanced: [
+          { 
+            torch: true ,
+            iso: 55
+          }
+        ]
+      })
+      .catch( err => {
+        console.log(err)
+      })
+
       imageCapture = new ImageCapture(track);
 
       function startLoop() {
