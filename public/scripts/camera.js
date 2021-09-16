@@ -70,6 +70,9 @@ const startVideo = async (constraints) => {
   console.log(cameraCapabilities)
   const currentCameraSettings = track.getSettings();
   document.getElementById('current-settings').onclick = () => {
+    const settingsInfo = document.createElement('p');
+    settingsInfo.innerText = currentCameraSettings.focusDistance
+    document.body.appendChild(settingsInfo)
     console.log(track.getSettings())
   }
 
