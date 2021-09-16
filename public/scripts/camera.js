@@ -155,8 +155,8 @@ const photoLoop = () => {
       track.applyConstraints({
         advanced: [
           { 
-            torch: true ,
-            iso: 55
+            torch: false ,
+            zoom: 8
           }
         ]
       })
