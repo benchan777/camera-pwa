@@ -72,14 +72,14 @@ const startVideo = async (constraints) => {
   video.addEventListener('loadeddata', predictWebcam);
 
   // Turn on flashlight
-  // track.applyConstraints({
-  //   advanced: [
-  //     { torch: true }
-  //   ]
-  // })
-  // .catch( err => {
-  //   document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
-  // })
+  track.applyConstraints({
+    advanced: [
+      { torch: true }
+    ]
+  })
+  .catch( err => {
+    document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
+  })
 }
 
 // Function that can take a full resolution photo with the camera
@@ -141,8 +141,7 @@ const photoLoop = () => {
     const videoConstraints = {
       video: {
         deviceId: camera.deviceId,
-        facingMode: 'environment',
-        fillLightMode: 'flash'
+        facingMode: 'environment'
       }
     };
 
@@ -308,21 +307,19 @@ document.getElementById('play').onclick = () => {
     navigator.mediaDevices.enumerateDevices()
     .then( devices => {
       const cameras = devices.filter( device => device.kind === 'videoinput');
-      const camera = cameras[cameras.length - 1];
+      // const camera = cameras[cameras.length - 1];
+      const camera = cameras[0]
 
       const videoConstraints = {
         video: {
           deviceId: camera.deviceId,
-          facingMode: 'environment',
-          iso: 300
-        }
+          facingMode: 'environment'        }
       }
 
       startVideo(videoConstraints);
     })
   } else {
-    const errorMessage = document.getElementById('errorMessage');
-    errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
+    document.getElementById('errorMessage').innerHTML = 'getUserMedia() is not supported by this browser.'
   }
 };
 
