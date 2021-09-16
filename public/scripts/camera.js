@@ -66,6 +66,7 @@ const startVideo = async (constraints) => {
 
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
   const track = stream.getVideoTracks()[0]
+  console.log(track.getCapabilities())
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
@@ -302,7 +303,9 @@ document.getElementById('play').onclick = () => {
       const videoConstraints = {
         video: {
           deviceId: camera.deviceId,
-          facingMode: 'environment'        }
+          facingMode: 'environment',
+          zoom: true,
+        }
       }
 
       startVideo(videoConstraints);
