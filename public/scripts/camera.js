@@ -184,9 +184,7 @@ const photoLoop = () => {
       const track = stream.getVideoTracks()[0];
       track.applyConstraints({
         advanced: [
-          { 
-            torch: false
-          }
+          { torch: false }
         ]
       })
       .catch( err => {
