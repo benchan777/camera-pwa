@@ -75,7 +75,7 @@ const startVideo = async (constraints) => {
   track.applyConstraints({
     advanced: [
       { torch: true },
-      { iso: 300 }
+      { zoom: 10 }
     ]
   })
   .catch( err => {
