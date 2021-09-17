@@ -17,6 +17,15 @@ let children = [];
 let imageCount = 0;
 let deferredPrompt;
 let tensors;
+const names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
+               'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+               'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+               'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
+               'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+               'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+               'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+               'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
+               'hair drier', 'toothbrush']
 
 // Triggers browser to prompt user to install the PWA
 // Save event deferred event in case user doesn't take default install prompt
@@ -51,18 +60,18 @@ openRequest.onerror = event => {
 };
 
 // Load coco-ssd (object detection model) 
-cocoSsd.load()
-.then( loadedModel => {
-  model = loadedModel;
-  document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
-})
-
-// Load yolov5 model
-// tf.loadGraphModel('/get-model')
+// cocoSsd.load()
 // .then( loadedModel => {
 //   model = loadedModel;
 //   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
 // })
+
+// Load yolov5 model
+tf.loadGraphModel('/get-model')
+.then( loadedModel => {
+  model = loadedModel;
+  document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
+})
 
 // Function that starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
@@ -120,8 +129,8 @@ const startVideo = async (constraints) => {
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
-  // video.addEventListener('loadeddata', objectDetection);
-  video.addEventListener('loadeddata', predictWebcam);
+  video.addEventListener('loadeddata', objectDetection);
+  // video.addEventListener('loadeddata', predictWebcam);
 
   // Turn on flashlight
   track.applyConstraints({
@@ -240,12 +249,26 @@ const objectDetection = () => {
   // Convert video frames to tensors so that TF can analyze them
   tensors = tf.tidy( () => {
     const input = tf.browser.fromPixels(video)
+    // const input = tf.browser.fromPixels(document.getElementById('kangaroo'))
     return input.expandDims(0).toFloat()
   });
 
   model.executeAsync(tensors)
   .then( predictions => {
-    console.log(predictions[0].dataSync())
+    const [boxes, scores, classes, valid_detections] = predictions;
+    console.log(classes.dataSync())
+    console.log(scores.dataSync())
+    for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
+      // let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
+      const objectName = names[classes.dataSync()[i]];
+      const score = scores.dataSync()[i];
+      // const width = x2 - x1;
+      // const height = y2 - y1;
+      // console.log(width)
+      // console.log(height)
+      // console.log(objectName);
+      // console.log(score);
+    }
   });
 
   // window.requestAnimationFrame(objectDetection)
@@ -311,6 +334,8 @@ document.getElementById('play').onclick = () => {
 
       const videoConstraints = {
         video: {
+          // These width and height dimensions are specific to the test yolov5 model
+          // May need to modify later to be compatible with other models
           width: { exact: 320 },
           height: { exact: 320 },
           deviceId: camera.deviceId,
