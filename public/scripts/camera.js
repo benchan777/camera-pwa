@@ -51,18 +51,18 @@ openRequest.onerror = event => {
 };
 
 // Load coco-ssd (object detection model) 
-// cocoSsd.load()
-// .then( loadedModel => {
-//   model = loadedModel;
-//   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
-// })
-
-// Load yolov5 model
-tf.loadGraphModel('/get-model')
+cocoSsd.load()
 .then( loadedModel => {
   model = loadedModel;
   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
 })
+
+// Load yolov5 model
+// tf.loadGraphModel('/get-model')
+// .then( loadedModel => {
+//   model = loadedModel;
+//   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
+// })
 
 // Function that starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
@@ -120,7 +120,8 @@ const startVideo = async (constraints) => {
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
-  video.addEventListener('loadeddata', objectDetection);
+  // video.addEventListener('loadeddata', objectDetection);
+  video.addEventListener('loadeddata', predictWebcam);
 
   // Turn on flashlight
   track.applyConstraints({
@@ -255,7 +256,7 @@ const predictWebcam = () => {
   // Now let's start classifying a frame in the stream.
   model.detect(video)
   .then( predictions => {
-    console.log(predictions)
+    // console.log(predictions)
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
     }
