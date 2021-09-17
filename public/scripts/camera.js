@@ -16,6 +16,7 @@ let model = undefined;
 let children = [];
 let imageCount = 0;
 let deferredPrompt;
+let tensors;
 
 // Triggers browser to prompt user to install the PWA
 // Save event deferred event in case user doesn't take default install prompt
@@ -50,7 +51,14 @@ openRequest.onerror = event => {
 };
 
 // Load coco-ssd (object detection model) 
-cocoSsd.load()
+// cocoSsd.load()
+// .then( loadedModel => {
+//   model = loadedModel;
+//   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
+// })
+
+// Load yolov5 model
+tf.loadGraphModel('/get-model')
 .then( loadedModel => {
   model = loadedModel;
   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
@@ -92,19 +100,19 @@ const startVideo = async (constraints) => {
   }
 
   // Add focus distance capabilities to the slider
-  focusInput.min = cameraCapabilities.focusDistance.min;
-  focusInput.max = cameraCapabilities.focusDistance.max;
-  focusInput.step = cameraCapabilities.focusDistance.step;
-  focusInput.value = currentCameraSettings.focusDistance;
-  focusInput.oninput = event => {
-    track.applyConstraints({
-      advanced: [{ focusMode: 'manual', focusDistance: event.target.value }]
-    })
-  }
+  // focusInput.min = cameraCapabilities.focusDistance.min;
+  // focusInput.max = cameraCapabilities.focusDistance.max;
+  // focusInput.step = cameraCapabilities.focusDistance.step;
+  // focusInput.value = currentCameraSettings.focusDistance;
+  // focusInput.oninput = event => {
+  //   track.applyConstraints({
+  //     advanced: [{ focusMode: 'manual', focusDistance: event.target.value }]
+  //   })
+  // }
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
-  video.addEventListener('loadeddata', predictWebcam);
+  video.addEventListener('loadeddata', objectDetection);
 
   // Turn on flashlight
   track.applyConstraints({
@@ -218,11 +226,28 @@ const clearDb = () => {
   })
 };
 
+// New object detection function for new model format
+const objectDetection = () => {
+  // Convert video frames to tensors so that TF can analyze them
+  tensors = tf.tidy( () => {
+    const input = tf.browser.fromPixels(video)
+    return input.expandDims(0).toFloat()
+  });
+
+  model.executeAsync(tensors)
+  .then( predictions => {
+    console.log(predictions[0].dataSync())
+  });
+
+  // window.requestAnimationFrame(objectDetection)
+}
+
 // Draws a frame around the subject based on confidence score returned by tensorflow
 const predictWebcam = () => {
   // Now let's start classifying a frame in the stream.
   model.detect(video)
   .then( predictions => {
+    console.log(predictions)
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
     }
@@ -277,6 +302,8 @@ document.getElementById('play').onclick = () => {
 
       const videoConstraints = {
         video: {
+          width: { exact: 320 },
+          height: { exact: 320 },
           deviceId: camera.deviceId,
           facingMode: 'environment',
           zoom: true
