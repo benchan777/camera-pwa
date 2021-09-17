@@ -249,15 +249,14 @@ const objectDetection = () => {
   // Convert video frames to tensors so that TF can analyze them
   tensors = tf.tidy( () => {
     const input = tf.browser.fromPixels(video)
-    // const input = tf.browser.fromPixels(document.getElementById('kangaroo'))
     return input.expandDims(0).toFloat()
   });
 
   model.executeAsync(tensors)
   .then( predictions => {
     const [boxes, scores, classes, valid_detections] = predictions;
-    console.log(classes.dataSync())
-    console.log(scores.dataSync())
+    // console.log(classes.dataSync())
+    // console.log(scores.dataSync())
     for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
       // let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
@@ -266,8 +265,8 @@ const objectDetection = () => {
       // const height = y2 - y1;
       // console.log(width)
       // console.log(height)
-      // console.log(objectName);
-      // console.log(score);
+      console.log(objectName);
+      console.log(score);
     }
   });
 
