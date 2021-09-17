@@ -89,26 +89,34 @@ const startVideo = async (constraints) => {
   const focusInput = document.getElementById('focus')
 
   // Add Zoom capabilities to the slider
-  zoomInput.min = cameraCapabilities.zoom.min;
-  zoomInput.max = cameraCapabilities.zoom.max;
-  zoomInput.step = cameraCapabilities.zoom.step;
-  zoomInput.value = currentCameraSettings.zoom;
-  zoomInput.oninput = (event) => {
-    track.applyConstraints({
-      advanced: [{ zoom: event.target.value }]
-    })
+  if ('zoom' in currentCameraSettings) {
+    zoomInput.min = cameraCapabilities.zoom.min;
+    zoomInput.max = cameraCapabilities.zoom.max;
+    zoomInput.step = cameraCapabilities.zoom.step;
+    zoomInput.value = currentCameraSettings.zoom;
+    zoomInput.oninput = (event) => {
+      track.applyConstraints({
+        advanced: [{ zoom: event.target.value }]
+      })
+    }
+  } else {
+    console.log('This camera does not have zoom capabilities.')
   }
 
   // Add focus distance capabilities to the slider
-  // focusInput.min = cameraCapabilities.focusDistance.min;
-  // focusInput.max = cameraCapabilities.focusDistance.max;
-  // focusInput.step = cameraCapabilities.focusDistance.step;
-  // focusInput.value = currentCameraSettings.focusDistance;
-  // focusInput.oninput = event => {
-  //   track.applyConstraints({
-  //     advanced: [{ focusMode: 'manual', focusDistance: event.target.value }]
-  //   })
-  // }
+  if ('focusDistance' in currentCameraSettings) {
+    focusInput.min = cameraCapabilities.focusDistance.min;
+    focusInput.max = cameraCapabilities.focusDistance.max;
+    focusInput.step = cameraCapabilities.focusDistance.step;
+    focusInput.value = currentCameraSettings.focusDistance;
+    focusInput.oninput = event => {
+      track.applyConstraints({
+        advanced: [{ focusMode: 'manual', focusDistance: event.target.value }]
+      })
+    }
+  } else {
+    console.log('This camera does not have focusDistance capabilities.')
+  }
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
