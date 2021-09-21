@@ -303,7 +303,7 @@ const objectDetection = () => {
     // const [boxes, scores, classes, valid_detections] = predictions; // for original example model
     // const [classes, boxes, valid_detections, scores] = predictions; // for new 640x640 model
     // const [boxes, valid_detections, scores, classes] = predictions; // for new 320x320 model
-    const [valid_detections, classes, scores, boxes] = predictions;
+    const [boxes, valid_detections, scores, classes] = predictions;
 
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
@@ -314,6 +314,11 @@ const objectDetection = () => {
       let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
+
+      // console.log(valid_detections.dataSync())
+      // console.log(classes.dataSync())
+      // console.log(scores.dataSync())
+      // console.log(boxes.dataSync())
       
       if(score > 0.60) {
         const p = document.createElement('p');
