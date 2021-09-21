@@ -347,9 +347,16 @@ const objectDetection = () => {
         children.push(p);
       }
     }
+  })
+  .catch( error => {
+    for (let i = 0; i < children.length; i++) {
+      liveVideo.removeChild(children[i]);
+    }
+    children.splice(0);
   });
-  tf.dispose(tensors)
-  window.requestAnimationFrame(objectDetection)
+
+  tf.dispose(tensors) // Remove old tensors to prevent memory leak
+  window.requestAnimationFrame(objectDetection) // Call function again to loop
 }
 
 // Draws a frame around the subject based on confidence score returned by tensorflow
