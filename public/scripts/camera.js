@@ -17,15 +17,17 @@ let children = [];
 let imageCount = 0;
 let deferredPrompt;
 
-const names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
-               'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-               'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
-               'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
-               'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-               'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
-               'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-               'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
-               'hair drier', 'toothbrush']
+// const names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
+//                'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+//                'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+//                'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
+//                'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+//                'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+//                'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+//                'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
+//                'hair drier', 'toothbrush']
+
+const names = ['', 'pharynx', 'tonsil', 'tongue', 'uvula']
 
 // Triggers browser to prompt user to install the PWA
 // Save event deferred event in case user doesn't take default install prompt
@@ -251,42 +253,41 @@ const tfTest = () => {
   const input = tf.image.resizeBilinear(tf.browser.fromPixels(tonsil), [320, 320]).div(255.0).expandDims().toFloat();
   model.executeAsync(input)
   .then( predictions => {
-    // const [boxes, scores, classes, valid_detections] = predictions;
-    const [valid_detections, boxes, classes, scores] = predictions;
-    // console.log(predictions)
+    const [boxes, valid_detections, scores, classes] = predictions;
+
     console.log(boxes.dataSync())
     console.log(scores.dataSync())
     console.log(classes.dataSync())
     console.log(valid_detections.dataSync())
-    // for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
-    //   let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
-    //   // const objectName = names[classes.dataSync()[i]];
-    //   const objectName = classes.dataSync()[i];
-    //   const score = scores.dataSync()[i];
+
+    for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
+      let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
+      const objectName = names[classes.dataSync()[i]];
+      const score = scores.dataSync()[i];
       
-    //   if(score > 0.01) {
-    //     const p = document.createElement('p');
-    //     p.innerText = objectName + ' - with '
-    //     + Math.round(parseFloat(score) * 100) 
-    //     + '% confidence.';
-    //     p.style = 'margin-left: ' + x1 + 'px; margin-top: '
-    //       + ((y1 * 255) - 10) + 'px; width: ' 
-    //       + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
+      if(score > 0.01) {
+        const p = document.createElement('p');
+        p.innerText = objectName + ' - with '
+        + Math.round(parseFloat(score) * 100) 
+        + '% confidence.';
+        p.style = 'margin-left: ' + x1 + 'px; margin-top: '
+          + ((y1 * 255) - 10) + 'px; width: ' 
+          + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
 
-    //     // Draw box around detected object
-    //     const highlighter = document.createElement('div');
-    //     highlighter.setAttribute('class', 'highlighter');
-    //     highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
-    //       + (y1 * 255) + 'px; width: ' 
-    //       + (x2 * 255) + 'px; height: '
-    //       + (y2 * 255) + 'px;';
+        // Draw box around detected object
+        const highlighter = document.createElement('div');
+        highlighter.setAttribute('class', 'highlighter');
+        highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
+          + (y1 * 255) + 'px; width: ' 
+          + (x2 * 255) + 'px; height: '
+          + (y2 * 255) + 'px;';
 
-    //     liveVideo.appendChild(highlighter);
-    //     liveVideo.appendChild(p);
-    //     children.push(highlighter);
-    //     children.push(p);
-    //   }
-    // }
+        liveVideo.appendChild(highlighter);
+        liveVideo.appendChild(p);
+        children.push(highlighter);
+        children.push(p);
+      }
+    }
   })
 }
 
