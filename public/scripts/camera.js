@@ -27,7 +27,7 @@ let deferredPrompt;
 //                'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
 //                'hair drier', 'toothbrush']
 
-const names = ['', 'pharynx', 'tonsil', 'tongue', 'uvula']
+const names = ['pharynx', '', 'tonsil', 'tongue', 'uvula']
 
 // Triggers browser to prompt user to install the PWA
 // Save event deferred event in case user doesn't take default install prompt
