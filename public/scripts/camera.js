@@ -255,15 +255,18 @@ const tfTest = () => {
   .then( predictions => {
     const [boxes, valid_detections, scores, classes] = predictions;
 
-    console.log(boxes.dataSync())
-    console.log(scores.dataSync())
-    console.log(classes.dataSync())
-    console.log(valid_detections.dataSync())
+    // console.log(boxes.dataSync())
+    // console.log(scores.dataSync())
+    // console.log(classes.dataSync())
+    // console.log(valid_detections.dataSync())
 
     for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
       let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
+
+      console.log(objectName);
+      console.log(score);
       
       if(score > 0.01) {
         const p = document.createElement('p');
@@ -428,8 +431,8 @@ document.getElementById('play').onclick = () => {
 
 // Pause video stream when pause button is clicked
 document.getElementById('pause').onclick = () => {
-  // video.pause();
-  tfTest();
+  video.pause();
+  // tfTest();
 };
 
 // Display all images located in IndexedDB
