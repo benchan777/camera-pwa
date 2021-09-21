@@ -251,12 +251,42 @@ const tfTest = () => {
   const input = tf.image.resizeBilinear(tf.browser.fromPixels(tonsil), [320, 320]).div(255.0).expandDims().toFloat();
   model.executeAsync(input)
   .then( predictions => {
-    const [boxes, scores, classes, valid_detections] = predictions;
-    console.log(predictions)
-    console.log(names[boxes.dataSync()[0]])
+    // const [boxes, scores, classes, valid_detections] = predictions;
+    const [valid_detections, boxes, classes, scores] = predictions;
+    // console.log(predictions)
+    console.log(boxes.dataSync())
     console.log(scores.dataSync())
     console.log(classes.dataSync())
     console.log(valid_detections.dataSync())
+    // for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
+    //   let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
+    //   // const objectName = names[classes.dataSync()[i]];
+    //   const objectName = classes.dataSync()[i];
+    //   const score = scores.dataSync()[i];
+      
+    //   if(score > 0.01) {
+    //     const p = document.createElement('p');
+    //     p.innerText = objectName + ' - with '
+    //     + Math.round(parseFloat(score) * 100) 
+    //     + '% confidence.';
+    //     p.style = 'margin-left: ' + x1 + 'px; margin-top: '
+    //       + ((y1 * 255) - 10) + 'px; width: ' 
+    //       + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
+
+    //     // Draw box around detected object
+    //     const highlighter = document.createElement('div');
+    //     highlighter.setAttribute('class', 'highlighter');
+    //     highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
+    //       + (y1 * 255) + 'px; width: ' 
+    //       + (x2 * 255) + 'px; height: '
+    //       + (y2 * 255) + 'px;';
+
+    //     liveVideo.appendChild(highlighter);
+    //     liveVideo.appendChild(p);
+    //     children.push(highlighter);
+    //     children.push(p);
+    //   }
+    // }
   })
 }
 
@@ -272,7 +302,8 @@ const objectDetection = () => {
   .then( predictions => {
     // const [boxes, scores, classes, valid_detections] = predictions; // for original example model
     // const [classes, boxes, valid_detections, scores] = predictions; // for new 640x640 model
-    const [boxes, valid_detections, scores, classes] = predictions; // for new 320x320 model
+    // const [boxes, valid_detections, scores, classes] = predictions; // for new 320x320 model
+    const [valid_detections, classes, scores, boxes] = predictions;
 
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
@@ -284,7 +315,7 @@ const objectDetection = () => {
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
       
-      if(score > 0.01) {
+      if(score > 0.60) {
         const p = document.createElement('p');
         p.innerText = objectName + ' - with '
         + Math.round(parseFloat(score) * 100) 

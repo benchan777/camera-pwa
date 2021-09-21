@@ -7,6 +7,7 @@
 <div>
     <div id="liveVideo">
         <video id="webcam" autoplay></video>
+        {{!-- <img id="tonsil" src="https://i.imgur.com/402eJRQ.jpg" crossorigin="anonymous"> --}}
     </div>
 
     <p id="information">Loading model. Please wait before starting camera.</p>
@@ -28,12 +29,12 @@
 
     <p id="errorMessage"></p>
 
-    <img id="tonsil" src="https://i.imgur.com/FyhW2SJ.jpg" crossorigin="anonymous">
+    <img id="tonsil" src="https://i.imgur.com/402eJRQ.jpg" crossorigin="anonymous">
 
 </div>
 
-{{!-- <script src="./scripts/tensorflow.js" type="text/javascript"></script> --}}
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+<script src="./scripts/tensorflow.js" type="text/javascript"></script>
+{{!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script> --}}
 {{!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js"></script> --}}
 <script src="./scripts/coco-ssd.js"></script>
 <script type="module" src="./scripts/camera.js"></script>
