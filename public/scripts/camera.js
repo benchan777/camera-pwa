@@ -252,7 +252,8 @@ const tfTest = () => {
   model.executeAsync(input)
   .then( predictions => {
     const [boxes, scores, classes, valid_detections] = predictions;
-    console.log(boxes.dataSync())
+    console.log(predictions)
+    console.log(names[boxes.dataSync()[0]])
     console.log(scores.dataSync())
     console.log(classes.dataSync())
     console.log(valid_detections.dataSync())
@@ -266,13 +267,12 @@ const objectDetection = () => {
     const input = tf.browser.fromPixels(video)
     return input.div(255.0).expandDims(0).toFloat()
   });
-  // console.log(tensors)
-
+  
   model.executeAsync(tensors)
   .then( predictions => {
-    const [boxes, scores, classes, valid_detections] = predictions;
-    console.log(scores.dataSync())
-    console.log(classes.dataSync())
+    // const [boxes, scores, classes, valid_detections] = predictions; // for original example model
+    // const [classes, boxes, valid_detections, scores] = predictions; // for new 640x640 model
+    const [boxes, valid_detections, scores, classes] = predictions; // for new 320x320 model
 
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
@@ -284,7 +284,7 @@ const objectDetection = () => {
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
       
-      if(score > 0.66) {
+      if(score > 0.01) {
         const p = document.createElement('p');
         p.innerText = objectName + ' - with '
         + Math.round(parseFloat(score) * 100) 
@@ -308,7 +308,7 @@ const objectDetection = () => {
       }
     }
   });
-
+  tf.dispose(tensors)
   window.requestAnimationFrame(objectDetection)
 }
 
