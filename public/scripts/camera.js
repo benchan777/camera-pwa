@@ -248,11 +248,14 @@ const clearDb = () => {
 
 const tfTest = () => {
   const tonsil = document.getElementById('tonsil');
-  const input = tf.image.resizeBilinear(tf.browser.fromPixels(tonsil), [640, 640]).div(255.0).expandDims().toFloat();
-  console.log(input)
+  const input = tf.image.resizeBilinear(tf.browser.fromPixels(tonsil), [320, 320]).div(255.0).expandDims().toFloat();
   model.executeAsync(input)
   .then( predictions => {
-    console.log('predictions')
+    const [boxes, scores, classes, valid_detections] = predictions;
+    console.log(boxes.dataSync())
+    console.log(scores.dataSync())
+    console.log(classes.dataSync())
+    console.log(valid_detections.dataSync())
   })
 }
 
@@ -263,11 +266,13 @@ const objectDetection = () => {
     const input = tf.browser.fromPixels(video)
     return input.div(255.0).expandDims(0).toFloat()
   });
-  console.log(tensors)
+  // console.log(tensors)
 
   model.executeAsync(tensors)
   .then( predictions => {
     const [boxes, scores, classes, valid_detections] = predictions;
+    console.log(scores.dataSync())
+    console.log(classes.dataSync())
 
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
@@ -304,7 +309,7 @@ const objectDetection = () => {
     }
   });
 
-  // window.requestAnimationFrame(objectDetection)
+  window.requestAnimationFrame(objectDetection)
 }
 
 // Draws a frame around the subject based on confidence score returned by tensorflow
@@ -369,8 +374,8 @@ document.getElementById('play').onclick = () => {
         video: {
           // These width and height dimensions are specific to the test yolov5 model
           // May need to modify later to be compatible with other models
-          width: { exact: 640 },
-          height: { exact: 640 },
+          width: { exact: 320 },
+          height: { exact: 320 },
           deviceId: camera.deviceId,
           facingMode: 'environment',
           zoom: true
