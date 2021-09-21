@@ -13,10 +13,6 @@
     <div class="video-controls">
         <button id="play" title="Play">Start camera</button>
         <button id="pause" title="Pause">Pause Video</button>
-        {{!-- Temporary flash toggle button for testing --}}
-        {{!-- <button id="new-model" title="new-model">Start Camera w/ New Model</button> --}}
-        {{!-- <button id="photo-loop" title="Photo Loop">Start photo loop</button>
-        <button id="pause-photo-loop" title="Pause photo loop">Pause photo loop</button> --}}
         <button id="save-image" title="Save">Save Image</button>
         <button id="view" title="View">View Photos</button>
     </div>
@@ -32,9 +28,11 @@
 
     <p id="errorMessage"></p>
 
+    <img id="tonsil" src="https://images.emedicinehealth.com/images/article/main_image/tonsil-stones.jpg" crossorigin="anonymous">
+
 </div>
 
-<script src="./scripts/tensorflow.js" type="text/javascript"></script>
-{{!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.6.0/dist/tf.min.js"></script> --}}
+{{!-- <script src="./scripts/tensorflow.js" type="text/javascript"></script> --}}
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
 <script src="./scripts/coco-ssd.js"></script>
 <script type="module" src="./scripts/camera.js"></script>

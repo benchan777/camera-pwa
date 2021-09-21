@@ -16,7 +16,7 @@ let model = undefined;
 let children = [];
 let imageCount = 0;
 let deferredPrompt;
-let tensors;
+
 const names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
                'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
                'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
@@ -83,7 +83,7 @@ const startVideo = async (constraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
   const track = stream.getVideoTracks()[0]
   const cameraCapabilities = track.getCapabilities();
-  console.log(cameraCapabilities)
+  // console.log(cameraCapabilities)
   const currentCameraSettings = track.getSettings();
 
   // Get current camera settings on button click
@@ -108,7 +108,8 @@ const startVideo = async (constraints) => {
         advanced: [{ zoom: event.target.value }]
       })
     }
-  } else {
+  } else { // Hide zoom slider if zoom capabilities don't exist
+    document.getElementById('zoom').style.display = 'none';
     console.log('This camera does not have zoom capabilities.')
   }
 
@@ -123,7 +124,8 @@ const startVideo = async (constraints) => {
         advanced: [{ focusMode: 'manual', focusDistance: event.target.value }]
       })
     }
-  } else {
+  } else { // Hide focus slider if focus capabilities don't exist
+    document.getElementById('focus').style.display = 'none';
     console.log('This camera does not have focusDistance capabilities.')
   }
 
@@ -244,29 +246,61 @@ const clearDb = () => {
   })
 };
 
+const tfTest = () => {
+  const tonsil = document.getElementById('tonsil');
+  const input = tf.image.resizeBilinear(tf.browser.fromPixels(tonsil), [640, 640]).div(255.0).expandDims().toFloat();
+  console.log(input)
+  model.executeAsync(input)
+  .then( predictions => {
+    console.log('predictions')
+  })
+}
+
 // New object detection function for new model format
 const objectDetection = () => {
   // Convert video frames to tensors so that TF can analyze them
-  tensors = tf.tidy( () => {
+  const tensors = tf.tidy( () => {
     const input = tf.browser.fromPixels(video)
-    return input.expandDims(0).toFloat()
+    return input.div(255.0).expandDims(0).toFloat()
   });
+  console.log(tensors)
 
   model.executeAsync(tensors)
   .then( predictions => {
     const [boxes, scores, classes, valid_detections] = predictions;
-    // console.log(classes.dataSync())
-    // console.log(scores.dataSync())
+
+    for (let i = 0; i < children.length; i++) {
+      liveVideo.removeChild(children[i]);
+    }
+    children.splice(0);
+
     for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
-      // let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
+      let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
-      // const width = x2 - x1;
-      // const height = y2 - y1;
-      // console.log(width)
-      // console.log(height)
-      console.log(objectName);
-      console.log(score);
+      
+      if(score > 0.66) {
+        const p = document.createElement('p');
+        p.innerText = objectName + ' - with '
+        + Math.round(parseFloat(score) * 100) 
+        + '% confidence.';
+        p.style = 'margin-left: ' + x1 + 'px; margin-top: '
+          + ((y1 * 255) - 10) + 'px; width: ' 
+          + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
+
+        // Draw box around detected object
+        const highlighter = document.createElement('div');
+        highlighter.setAttribute('class', 'highlighter');
+        highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
+          + (y1 * 255) + 'px; width: ' 
+          + (x2 * 255) + 'px; height: '
+          + (y2 * 255) + 'px;';
+
+        liveVideo.appendChild(highlighter);
+        liveVideo.appendChild(p);
+        children.push(highlighter);
+        children.push(p);
+      }
     }
   });
 
@@ -335,8 +369,8 @@ document.getElementById('play').onclick = () => {
         video: {
           // These width and height dimensions are specific to the test yolov5 model
           // May need to modify later to be compatible with other models
-          width: { exact: 320 },
-          height: { exact: 320 },
+          width: { exact: 640 },
+          height: { exact: 640 },
           deviceId: camera.deviceId,
           facingMode: 'environment',
           zoom: true
@@ -352,7 +386,8 @@ document.getElementById('play').onclick = () => {
 
 // Pause video stream when pause button is clicked
 document.getElementById('pause').onclick = () => {
-  video.pause();
+  // video.pause();
+  tfTest();
 };
 
 // Display all images located in IndexedDB
