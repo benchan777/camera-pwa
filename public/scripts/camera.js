@@ -1,14 +1,6 @@
-// const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
-const img = document.querySelector('img');
-// const screenshot = document.querySelector('.save-image')
-// const buttons = [...cameraControls.querySelectorAll('button')];
-// const [play, pause, saveImage, viewPhotos] = buttons;
-// const play = document.getElementById('play');
-// const pause = document.getElementById('pause');
-// const saveImage = document.getElementById('save-image');
-// const viewPhotos = document.getElementById('view');
-// const installApp = document.getElementById('installApp');
+// const img = document.querySelector('img');
+const liveVideo = document.getElementById('liveVideo')
 
 let cameraOn = false;
 let imageCapture;
@@ -318,18 +310,13 @@ const objectDetection = () => {
       let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
-
-      // console.log(valid_detections.dataSync())
-      // console.log(classes.dataSync())
-      // console.log(scores.dataSync())
-      // console.log(boxes.dataSync())
       
       if(score > 0.60) {
         const p = document.createElement('p');
         p.innerText = objectName + ' - with '
-        + Math.round(parseFloat(score) * 100) 
-        + '% confidence.';
-        p.style = 'margin-left: ' + x1 + 'px; margin-top: '
+          + Math.round(parseFloat(score) * 100) 
+          + '% confidence.';
+        p.style = 'margin-left: ' + (x1 * 255) + 'px; margin-top: '
           + ((y1 * 255) - 10) + 'px; width: ' 
           + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
 
@@ -349,6 +336,7 @@ const objectDetection = () => {
     }
   })
   .catch( error => {
+    // Ensure previous boxes around detected object are removed even if no object is detected
     for (let i = 0; i < children.length; i++) {
       liveVideo.removeChild(children[i]);
     }
