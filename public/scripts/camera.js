@@ -9,16 +9,6 @@ let children = [];
 let imageCount = 0;
 let deferredPrompt;
 
-// const names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
-//                'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-//                'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
-//                'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
-//                'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-//                'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
-//                'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-//                'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
-//                'hair drier', 'toothbrush']
-
 const names = ['pharynx', '', 'tonsil', 'tongue', 'uvula']
 
 // Triggers browser to prompt user to install the PWA
@@ -140,9 +130,14 @@ const startVideo = async (constraints) => {
 // Function that can take a full resolution photo with the camera
 const takePhoto = () => {
   return new Promise( (resolve, reject) => {
-    if (imageCount > 1) { // Number of photos to take before stopping
+    if (imageCount > 10) { // Number of photos to take before stopping
       imageCount = 0;
       document.getElementById('information').innerHTML = 'All images have been taken. Click on the View Photos button to view them!'
+      
+      // Video stream has new constraints after taking full resolution photo that may
+      // cause errors. Manually start video stream again with proper constraints for
+      // proper object detection
+      document.getElementById('play').click();
       return
     }
 
@@ -154,9 +149,10 @@ const takePhoto = () => {
       const videoConstraints = {
         video: {
           deviceId: camera.deviceId,
-          facingMode: 'environment'
+          facingMode: 'environment',
+          zoom: true
         }
-      }
+      };
   
       navigator.mediaDevices.getUserMedia(videoConstraints)
       .then( stream => {
@@ -247,11 +243,6 @@ const tfTest = () => {
   .then( predictions => {
     const [boxes, valid_detections, scores, classes] = predictions;
 
-    // console.log(boxes.dataSync())
-    // console.log(scores.dataSync())
-    // console.log(classes.dataSync())
-    // console.log(valid_detections.dataSync())
-
     for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
       let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
@@ -296,9 +287,6 @@ const objectDetection = () => {
   
   model.executeAsync(tensors)
   .then( predictions => {
-    // const [boxes, scores, classes, valid_detections] = predictions; // for original example model
-    // const [classes, boxes, valid_detections, scores] = predictions; // for new 640x640 model
-    // const [boxes, valid_detections, scores, classes] = predictions; // for new 320x320 model
     const [boxes, valid_detections, scores, classes] = predictions;
 
     for (let i = 0; i < children.length; i++) {
@@ -432,7 +420,6 @@ document.getElementById('pause').onclick = () => {
 
 // Display all images located in IndexedDB
 document.getElementById('view').onclick = () => {
-  // location.href = '/show-photos'
   getItem();
 };
 
