@@ -43,14 +43,7 @@ openRequest.onerror = event => {
   document.getElementById('errorMessage').innerHTML = `Unable to open IndexedDB. Error message: ${event}`
 };
 
-// Load coco-ssd (object detection model) 
-// cocoSsd.load()
-// .then( loadedModel => {
-//   model = loadedModel;
-//   document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
-// })
-
-// Load yolov5 model
+// Load model
 tf.loadGraphModel('/get-model')
 .then( loadedModel => {
   model = loadedModel;
@@ -236,47 +229,6 @@ const clearDb = () => {
   })
 };
 
-const tfTest = () => {
-  const tonsil = document.getElementById('tonsil');
-  const input = tf.image.resizeBilinear(tf.browser.fromPixels(tonsil), [320, 320]).div(255.0).expandDims().toFloat();
-  model.executeAsync(input)
-  .then( predictions => {
-    const [boxes, valid_detections, scores, classes] = predictions;
-
-    for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
-      let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
-      const objectName = names[classes.dataSync()[i]];
-      const score = scores.dataSync()[i];
-
-      console.log(objectName);
-      console.log(score);
-      
-      if(score > 0.01) {
-        const p = document.createElement('p');
-        p.innerText = objectName + ' - with '
-        + Math.round(parseFloat(score) * 100) 
-        + '% confidence.';
-        p.style = 'margin-left: ' + x1 + 'px; margin-top: '
-          + ((y1 * 255) - 10) + 'px; width: ' 
-          + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
-
-        // Draw box around detected object
-        const highlighter = document.createElement('div');
-        highlighter.setAttribute('class', 'highlighter');
-        highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
-          + (y1 * 255) + 'px; width: ' 
-          + (x2 * 255) + 'px; height: '
-          + (y2 * 255) + 'px;';
-
-        liveVideo.appendChild(highlighter);
-        liveVideo.appendChild(p);
-        children.push(highlighter);
-        children.push(p);
-      }
-    }
-  })
-}
-
 // New object detection function for new model format
 const objectDetection = () => {
   // Convert video frames to tensors so that TF can analyze them
@@ -334,50 +286,6 @@ const objectDetection = () => {
   tf.dispose(tensors) // Remove old tensors to prevent memory leak
   window.requestAnimationFrame(objectDetection) // Call function again to loop
 }
-
-// Draws a frame around the subject based on confidence score returned by tensorflow
-const predictWebcam = () => {
-  // Now let's start classifying a frame in the stream.
-  model.detect(video)
-  .then( predictions => {
-    // console.log(predictions)
-    for (let i = 0; i < children.length; i++) {
-      liveVideo.removeChild(children[i]);
-    }
-    children.splice(0);
-
-    // Loop through predictions and draw them to the live view if they
-    // have a high confidence score
-    for (let n = 0; n < predictions.length; n++ ) {
-      if(predictions[n].score > 0.66) {
-        // Display name of object detected along with confidence score
-        const p = document.createElement('p');
-        p.innerText = predictions[n].class  + ' - with ' 
-          + Math.round(parseFloat(predictions[n].score) * 100) 
-          + '% confidence.';
-        p.style = 'margin-left: ' + predictions[n].bbox[0] + 'px; margin-top: '
-          + (predictions[n].bbox[1] - 10) + 'px; width: ' 
-          + (predictions[n].bbox[2] - 10) + 'px; top: 0; left: 0;';
-
-        // Draw box around detected object
-        const highlighter = document.createElement('div');
-        highlighter.setAttribute('class', 'highlighter');
-        highlighter.style = 'left: ' + predictions[n].bbox[0] + 'px; top: '
-          + predictions[n].bbox[1] + 'px; width: ' 
-          + predictions[n].bbox[2] + 'px; height: '
-          + predictions[n].bbox[3] + 'px;';
-
-        liveVideo.appendChild(highlighter);
-        liveVideo.appendChild(p);
-        children.push(highlighter);
-        children.push(p);
-      }
-    }
-
-    // Call this function again to keep predicting when the browser is ready.
-    window.requestAnimationFrame(predictWebcam);
-  });
-};
 
 // Start video when play button is clicked
 document.getElementById('play').onclick = () => {
