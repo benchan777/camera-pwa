@@ -24,7 +24,6 @@ self.addEventListener('install', e => {
                 './model/group1-shard7of7.bin',
                 './model/model.json',
                 './scripts/camera.js',
-                './scripts/coco-ssd.js',
                 './scripts/tensorflow.js',
                 './styles/styles.css',
                 './views/layouts/main.handlebars',
