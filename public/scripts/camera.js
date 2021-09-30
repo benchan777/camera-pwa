@@ -1,4 +1,5 @@
 const video = document.querySelector('video');
+const canvas = document.querySelector('canvas');
 // const img = document.querySelector('img');
 const liveVideo = document.getElementById('liveVideo')
 
@@ -108,8 +109,8 @@ const startVideo = async (constraints) => {
 
   video.srcObject = stream;
   video.setAttribute("playsinline", true);
-  video.addEventListener('loadeddata', objectDetection);
-  // video.addEventListener('loadeddata', predictWebcam);
+  video.addEventListener('loadedmetadata', setCanvas); // Set canvas overlay to match video resolution
+  video.addEventListener('loadeddata', objectDetection); // Begin object detection after video has loaded
 
   // Turn on flashlight
   track.applyConstraints({
@@ -118,6 +119,35 @@ const startVideo = async (constraints) => {
   .catch( err => {
     document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
   })
+}
+
+const setCanvas = () => {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoWidth;
+};
+
+const drawCanvas = (x, y, width, height, object, score) => {
+  const ctx = canvas.getContext('2d');
+  let boxColor;
+
+  if (object == 'pharynx') {
+    boxColor = 'yellow';
+  } else if (object == 'tonsil') {
+    boxColor = 'blue';
+  } else if (object == 'uvula') {
+    boxColor = 'green';
+  } else if (object == 'tongue') {
+    boxColor = 'white';
+  } else {
+    boxColor = 'red';
+  }
+
+  ctx.beginPath();
+  ctx.strokeStyle = boxColor;
+  ctx.rect(x, y, width * 0.3, height * 0.3);
+  ctx.fillStyle = boxColor;
+  ctx.fillText(`${object} - ${Math.round(parseFloat(score) * 100)}%`, x, y)
+  ctx.stroke();
 }
 
 // Function that can take a full resolution photo with the camera
@@ -241,10 +271,13 @@ const objectDetection = () => {
   .then( predictions => {
     const [boxes, valid_detections, scores, classes] = predictions;
 
-    for (let i = 0; i < children.length; i++) {
-      liveVideo.removeChild(children[i]);
-    }
-    children.splice(0);
+    // for (let i = 0; i < children.length; i++) {
+    //   liveVideo.removeChild(children[i]);
+    // }
+    // children.splice(0);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 
     for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
       let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
@@ -252,26 +285,34 @@ const objectDetection = () => {
       const score = scores.dataSync()[i];
       
       if(score > 0.60) {
-        const p = document.createElement('p');
-        p.innerText = objectName + ' - with '
-          + Math.round(parseFloat(score) * 100) 
-          + '% confidence.';
-        p.style = 'margin-left: ' + (x1 * 255) + 'px; margin-top: '
-          + ((y1 * 255) - 10) + 'px; width: ' 
-          + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
+        const xCoordinate = x1 * 255
+        const yCoordinate = y1 * 255
+        const boxWidth = x2 * 255
+        const boxHeight = y2 * 255
+        // const boxWidth = (x2 * 255) - (x1 * 255);
+        // const boxHeight = (y2 * 255) - (y1 * 255);
+        drawCanvas(xCoordinate, yCoordinate, boxWidth, boxHeight, objectName, score)
 
-        // Draw box around detected object
-        const highlighter = document.createElement('div');
-        highlighter.setAttribute('class', 'highlighter');
-        highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
-          + (y1 * 255) + 'px; width: ' 
-          + (x2 * 255) + 'px; height: '
-          + (y2 * 255) + 'px;';
+        // const p = document.createElement('p');
+        // p.innerText = objectName + ' - with '
+        //   + Math.round(parseFloat(score) * 100) 
+        //   + '% confidence.';
+        // p.style = 'margin-left: ' + (x1 * 255) + 'px; margin-top: '
+        //   + ((y1 * 255) - 10) + 'px; width: ' 
+        //   + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
 
-        liveVideo.appendChild(highlighter);
-        liveVideo.appendChild(p);
-        children.push(highlighter);
-        children.push(p);
+        // // Draw box around detected object
+        // const highlighter = document.createElement('div');
+        // highlighter.setAttribute('class', 'highlighter');
+        // highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
+        //   + (y1 * 255) + 'px; width: ' 
+        //   + (x2 * 255) + 'px; height: '
+        //   + (y2 * 255) + 'px;';
+
+        // liveVideo.appendChild(highlighter);
+        // liveVideo.appendChild(p);
+        // children.push(highlighter);
+        // children.push(p);
       }
     }
   })
