@@ -143,9 +143,10 @@ const drawCanvas = (x, y, width, height, object, score) => {
   }
 
   ctx.beginPath();
-  // ctx.strokeStyle = boxColor;
+  ctx.strokeStyle = boxColor;
+  ctx.rect(x + (width * 0.25), y + (height * 0.25), width * 0.5, height * 0.5);
   ctx.fillStyle = boxColor;
-  ctx.globalAlpha = 0.1;
+  ctx.globalAlpha = 0.2;
   ctx.fillRect(x + (width * 0.25), y + (height * 0.25), width * 0.5, height * 0.5);
   ctx.globalAlpha = 1.0;
   ctx.fillStyle = boxColor;
