@@ -1,6 +1,5 @@
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-// const img = document.querySelector('img');
 const liveVideo = document.getElementById('liveVideo')
 
 let cameraOn = false;
@@ -119,17 +118,20 @@ const startVideo = async (constraints) => {
   .catch( err => {
     document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
   })
-}
+};
 
+// Set canvas height and width to match video stream so that it overlays properly
 const setCanvas = () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
 };
 
+// Draw information returned from tensorflow onto canvas overlay
 const drawCanvas = (x, y, width, height, object, score) => {
   const ctx = canvas.getContext('2d');
   let boxColor;
 
+  // Change box color depending on detected object
   if (object == 'pharynx') {
     boxColor = 'yellow';
   } else if (object == 'tonsil') {
@@ -142,6 +144,7 @@ const drawCanvas = (x, y, width, height, object, score) => {
     boxColor = 'red';
   }
 
+  // Offset dimension values by 50% to reduce box size a bit
   ctx.beginPath();
   ctx.strokeStyle = boxColor;
   ctx.rect(x + (width * 0.25), y + (height * 0.25), width * 0.5, height * 0.5);
@@ -152,7 +155,7 @@ const drawCanvas = (x, y, width, height, object, score) => {
   ctx.fillStyle = boxColor;
   ctx.fillText(`${object} - ${Math.round(parseFloat(score) * 100)}%`, x + (width * 0.25), y + (width * 0.25))
   ctx.stroke();
-}
+};
 
 // Function that can take a full resolution photo with the camera
 const takePhoto = () => {
@@ -273,64 +276,36 @@ const objectDetection = () => {
   
   model.executeAsync(tensors)
   .then( predictions => {
-    const [boxes, valid_detections, scores, classes] = predictions;
-
-    // for (let i = 0; i < children.length; i++) {
-    //   liveVideo.removeChild(children[i]);
-    // }
-    // children.splice(0);
+    // Clear previously drawn boxes
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    const [boxes, valid_detections, scores, classes] = predictions;
 
     for (let i = 0; i < valid_detections.dataSync()[0]; i ++) {
       let [x1, y1, x2, y2] = boxes.dataSync().slice(i * 4, (i + 1) * 4);
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
       
-      if(score > 0.20) {
-        const xCoordinate = x1 * 255
-        const yCoordinate = y1 * 255
-        const boxWidth = x2 * 255
-        const boxHeight = y2 * 255
-        // const boxWidth = (x2 * 255) - (x1 * 255);
-        // const boxHeight = (y2 * 255) - (y1 * 255);
+      if (score > 0.20) {
+        const xCoordinate = x1 * 255;
+        const yCoordinate = y1 * 255;
+        const boxWidth = x2 * 255;
+        const boxHeight = y2 * 255;
+
         drawCanvas(xCoordinate, yCoordinate, boxWidth, boxHeight, objectName, score)
-
-        // const p = document.createElement('p');
-        // p.innerText = objectName + ' - with '
-        //   + Math.round(parseFloat(score) * 100) 
-        //   + '% confidence.';
-        // p.style = 'margin-left: ' + (x1 * 255) + 'px; margin-top: '
-        //   + ((y1 * 255) - 10) + 'px; width: ' 
-        //   + ((x2 * 255) - 10) + 'px; top: 0; left: 0;';
-
-        // // Draw box around detected object
-        // const highlighter = document.createElement('div');
-        // highlighter.setAttribute('class', 'highlighter');
-        // highlighter.style = 'left: ' + (x1 * 255) + 'px; top: '
-        //   + (y1 * 255) + 'px; width: ' 
-        //   + (x2 * 255) + 'px; height: '
-        //   + (y2 * 255) + 'px;';
-
-        // liveVideo.appendChild(highlighter);
-        // liveVideo.appendChild(p);
-        // children.push(highlighter);
-        // children.push(p);
       }
     }
   })
   .catch( error => {
     // Ensure previous boxes around detected object are removed even if no object is detected
-    for (let i = 0; i < children.length; i++) {
-      liveVideo.removeChild(children[i]);
-    }
-    children.splice(0);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   });
 
   tf.dispose(tensors) // Remove old tensors to prevent memory leak
   window.requestAnimationFrame(objectDetection) // Call function again to loop
-}
+};
 
 // Start video when play button is clicked
 document.getElementById('play').onclick = () => {
