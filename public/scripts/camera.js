@@ -123,7 +123,7 @@ const startVideo = async (constraints) => {
 
 const setCanvas = () => {
   canvas.width = video.videoWidth;
-  canvas.height = video.videoWidth;
+  canvas.height = video.videoHeight;
 };
 
 const drawCanvas = (x, y, width, height, object, score) => {
@@ -144,7 +144,7 @@ const drawCanvas = (x, y, width, height, object, score) => {
 
   ctx.beginPath();
   ctx.strokeStyle = boxColor;
-  ctx.rect(x, y, width * 0.3, height * 0.3);
+  ctx.rect(x + (width * 0.3), y + (height * 0.3), width * 0.3, height * 0.3);
   ctx.fillStyle = boxColor;
   ctx.fillText(`${object} - ${Math.round(parseFloat(score) * 100)}%`, x, y)
   ctx.stroke();
@@ -284,7 +284,7 @@ const objectDetection = () => {
       const objectName = names[classes.dataSync()[i]];
       const score = scores.dataSync()[i];
       
-      if(score > 0.60) {
+      if(score > 0.20) {
         const xCoordinate = x1 * 255
         const yCoordinate = y1 * 255
         const boxWidth = x2 * 255
