@@ -144,9 +144,9 @@ const drawCanvas = (x, y, width, height, object, score) => {
 
   ctx.beginPath();
   ctx.strokeStyle = boxColor;
-  ctx.rect(x + (width * 0.3), y + (height * 0.3), width * 0.3, height * 0.3);
+  ctx.rect(x + (width * 0.6), y + (height * 0.6), width * 0.6, height * 0.6);
   ctx.fillStyle = boxColor;
-  ctx.fillText(`${object} - ${Math.round(parseFloat(score) * 100)}%`, x, y)
+  ctx.fillText(`${object} - ${Math.round(parseFloat(score) * 100)}%`, x + (width * 0.6), y + (width * 0.6))
   ctx.stroke();
 }
 
