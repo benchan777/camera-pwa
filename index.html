@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrepScan</title>
+  <meta name="description"
+    content="Web app powered by AI and camera to take images of different areas of the throat." />
+
+  <!-- ICONS -->
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+  <link rel="alternate icon" href="/icons/favicon.ico" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
+  <link rel="mask-icon" href="/icons/favicon.svg" color="#ffffff" />
+  <meta name="theme-color" content="#ffffff" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/src/css/style.css" />
+  <link rel="stylesheet" href="/src/css/bootstrap.min.css" />
+</head>
+
+<body>
+  <div id="app">
+
+    <h1 class="text-center">StrepScan - MVP</h1>
+
+    <button id="installApp" hidden>Install</button>
+
+    <div id="liveVideo">
+      <video id="webcam" autoplay></video>
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="model_prog_main" class="progress" style="height: 25px;">
+      <div id="model_prog" class="progress-bar progress-bar-striped progress-bar-animated bg-dark" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">Loading Model</div>
+    </div>
+
+    <div id="all-controls">
+      <div class="video-controls">
+        <button id="play" title="Play" type="button" class="btn btn-dark" disabled>Start camera</button>
+        <button id="pause" title="Pause" hidden>Pause</button>
+        <button id="view" title="View" type="button" class="btn btn-dark"  data-bs-toggle="modal" data-bs-target="#imagesModal" disabled>View Photos</button>
+        <button id="save-image" title="Save" type="button" class="btn btn-dark" disabled>Save Image</button>
+      </div>
+
+      <div hidden>
+        <input type="range" id="zoom" name="zoom">
+        <label for="zoom">Zoom</label>
+
+        <input type="range" id="focus" name="focus">
+        <label for="focus">Focus</label>
+
+        <button id="current-settings">Get current camera settings</button>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="imagesModal" tabindex="-1" role="dialog" aria-labelledby="imagesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="imagesModalLabel">Saved Images</h5>
+            <button type="button" class="close btn-dark" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div id="img-gal" class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <p id="errorMessage"></p>
+      <p id='ver'>Early build - All functionality subject to change </p>
+  </div>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js"></script> -->
+  <script src="/js/tf.min.js"></script>
+  <script src="/js/jQuery.js"></script>
+  <script src="/src/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
